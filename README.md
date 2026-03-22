@@ -68,7 +68,7 @@ Role-protected route currently checks request header:
 ## 1) Clone and enter project
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/thegitguy-56/healthcare_analytics.git
 cd healthcare
 ```
 
