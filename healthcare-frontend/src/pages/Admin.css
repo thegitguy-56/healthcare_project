@@ -1,0 +1,146 @@
+.admin-container {
+  padding-bottom: 40px;
+}
+
+.admin-header {
+  margin-bottom: 32px;
+}
+
+.admin-section {
+  border-radius: 12px;
+  border: 1px solid #e0e4e8;
+  transition: all var(--transition-base);
+}
+
+.admin-section:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.admin-section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.admin-section-title-text {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* User Management Table */
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-table thead {
+  background-color: rgba(25, 118, 210, 0.05);
+  border-bottom: 2px solid #e0e4e8;
+}
+
+.user-table th {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px;
+  text-align: left;
+}
+
+.user-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e0e4e8;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.user-table tbody tr {
+  transition: background-color var(--transition-base);
+}
+
+.user-table tbody tr:hover {
+  background-color: rgba(25, 118, 210, 0.03);
+}
+
+.user-name {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* Access Logs Table */
+.access-logs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.access-logs-table thead {
+  background-color: rgba(25, 118, 210, 0.05);
+  border-bottom: 2px solid #e0e4e8;
+}
+
+.access-logs-table th {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px;
+  text-align: left;
+}
+
+.access-logs-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e0e4e8;
+  font-size: 13px;
+}
+
+.access-logs-table tbody tr {
+  transition: background-color var(--transition-base);
+}
+
+.access-logs-table tbody tr:hover {
+  background-color: rgba(25, 118, 210, 0.03);
+}
+
+/* Action Buttons */
+.action-button {
+  font-size: 12px;
+  text-transform: none;
+  padding: 4px 8px;
+  margin-right: 8px;
+}
+
+.action-button-edit {
+  color: var(--primary);
+}
+
+.action-button-edit:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+}
+
+.action-button-delete {
+  color: var(--danger);
+}
+
+.action-button-delete:hover {
+  background-color: rgba(198, 40, 40, 0.1);
+}
+
+/* Chips/Badges */
+.role-badge {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-badge {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.action-badge {
+  font-size: 12px;
+  font-weight: 600;
+}

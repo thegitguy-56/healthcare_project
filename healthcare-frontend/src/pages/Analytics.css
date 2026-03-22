@@ -1,0 +1,45 @@
+.analytics-container {
+  padding-bottom: 40px;
+}
+
+.analytics-header {
+  margin-bottom: 32px;
+}
+
+.analytics-chart-card {
+  border-radius: 12px;
+  border: 1px solid #e0e4e8;
+  transition: all var(--transition-base);
+}
+
+.analytics-chart-card:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+.analytics-metric {
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #fafbfc;
+  border: 1px solid #e0e4e8;
+  transition: all var(--transition-base);
+}
+
+.analytics-metric:hover {
+  background-color: #f5f7fb;
+  transform: translateX(4px);
+}
+
+.analytics-metric-label {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.analytics-metric-value {
+  font-weight: 700;
+  font-size: 28px;
+}

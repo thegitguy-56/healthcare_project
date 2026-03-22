@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@mui/icons-material": "^7.3.9",
+    "@mui/lab": "^7.0.1-beta.23",
+    "@mui/material": "^7.3.9",
+    "axios": "^1.13.6",
+    "chart.js": "^4.5.1",
+    "react-chartjs-2": "^5.3.1"
+  }
+}

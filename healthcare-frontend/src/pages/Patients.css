@@ -1,0 +1,76 @@
+.patients-container {
+  width: 100%;
+}
+
+.patient-search {
+  margin-bottom: 24px;
+}
+
+.patient-table {
+  border-collapse: collapse;
+}
+
+.patient-row {
+  transition: background-color var(--transition-base);
+}
+
+.patient-row:hover {
+  background-color: rgba(25, 118, 210, 0.03);
+}
+
+.patient-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-base);
+}
+
+.patient-link:hover {
+  color: var(--primary-light);
+  text-decoration: underline;
+}
+
+/* Table Header Styling */
+.patient-table thead tr {
+  background-color: rgba(25, 118, 210, 0.05);
+  border-bottom: 2px solid #e0e4e8;
+}
+
+.patient-table th {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px;
+}
+
+.patient-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e0e4e8;
+  color: var(--text-secondary);
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-active {
+  background-color: rgba(46, 125, 50, 0.1);
+  color: var(--success);
+}
+
+.status-recovering {
+  background-color: rgba(245, 124, 0, 0.1);
+  color: var(--warning);
+}
+
+.status-discharged {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text-secondary);
+}

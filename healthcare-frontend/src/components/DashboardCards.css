@@ -1,0 +1,21 @@
+.dashboard-card {
+  position: relative;
+  overflow: visible;
+}
+
+.dashboard-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #1976d2, #00acc1);
+  border-radius: 12px 12px 0 0;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.dashboard-card:hover::before {
+  opacity: 1;
+}

@@ -1,0 +1,94 @@
+.dashboard-layout {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  background: var(--bg-primary);
+}
+
+.navbar {
+  background: #ffffff !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border-bottom: 1px solid #e0e4e8;
+  z-index: 1200 !important;
+}
+
+.navbar .MuiToolbar-root {
+  background: #ffffff;
+  color: var(--text-primary);
+}
+
+.sidebar {
+  margin-top: 64px;
+  height: calc(100vh - 64px);
+}
+
+.main-content {
+  flex: 1;
+  margin-top: 64px;
+  margin-left: 260px; /* Sidebar width */
+  padding: 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-primary);
+  height: calc(100vh - 64px);
+}
+
+.nav-item {
+  position: relative;
+  margin-bottom: 8px !important;
+  border-radius: 8px !important;
+  transition: all var(--transition-base);
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary);
+  border-radius: 0 4px 4px 0;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.nav-item.active::before {
+  opacity: 1;
+}
+
+/* Scrollbar for main content */
+.main-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 4px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .main-content {
+    margin-top: 64px;
+    margin-left: 0;
+    width: 100%;
+  }
+}

@@ -1,0 +1,22 @@
+.dashboard-container {
+  width: 100%;
+  padding-bottom: 40px;
+}
+
+.chart-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e0e4e8;
+}
+
+.chart-card-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.chart-card-description {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin-bottom: 20px;
+}

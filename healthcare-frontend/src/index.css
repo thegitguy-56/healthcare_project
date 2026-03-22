@@ -1,0 +1,262 @@
+/* ===============================================
+   MODERN HEALTHCARE ANALYTICS DESIGN SYSTEM
+   =============================================== */
+
+/* Color Variables */
+:root {
+  /* Primary Colors */
+  --primary: #1976d2;
+  --primary-light: #42a5f5;
+  --primary-dark: #1565c0;
+  
+  /* Secondary Colors */
+  --secondary: #00acc1;
+  --secondary-light: #4dd0e1;
+  --secondary-dark: #00838f;
+  
+  /* Neutral Colors */
+  --bg-primary: #f5f7fb;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #fafbfc;
+  
+  /* Text Colors */
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a5568;
+  --text-tertiary: #7a8695;
+  
+  /* Status Colors */
+  --success: #2e7d32;
+  --warning: #f57c00;
+  --danger: #c62828;
+  --info: #0277bd;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.18);
+  
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+h1 {
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 28px;
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: 24px;
+  line-height: 1.4;
+}
+
+h4 {
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+h5 {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h6 {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* Links */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--primary-light);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* Global MUI Overrides */
+.MuiButton-root {
+  text-transform: none;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.MuiButton-contained {
+  box-shadow: var(--shadow-sm);
+}
+
+.MuiButton-contained:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.MuiCard-root {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all var(--transition-base);
+}
+
+.MuiCard-root:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.MuiPaper-root {
+  border-radius: var(--radius-lg);
+}
+
+.MuiTextField-root .MuiOutlinedInput-root {
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.MuiTextField-root .MuiOutlinedInput-root:hover {
+  border-color: var(--primary-light);
+}
+
+/* Loading Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.loading {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0)
+  );
+  background-size: 1000px 100%;
+}
+
+/* Utility Classes */
+.text-muted {
+  color: var(--text-tertiary);
+}
+
+.text-success {
+  color: var(--success);
+}
+
+.text-warning {
+  color: var(--warning);
+}
+
+.text-danger {
+  color: var(--danger);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-success {
+  background-color: rgba(46, 125, 50, 0.1);
+  color: var(--success);
+}
+
+.badge-warning {
+  background-color: rgba(245, 124, 0, 0.1);
+  color: var(--warning);
+}
+
+.badge-danger {
+  background-color: rgba(198, 40, 40, 0.1);
+  color: var(--danger);
+}
+
+.badge-info {
+  background-color: rgba(2, 119, 189, 0.1);
+  color: var(--info);
+}

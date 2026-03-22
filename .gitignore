@@ -1,0 +1,31 @@
+# Monorepo ignores (root)
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build artifacts
+build/
+dist/
+coverage/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python/cache artifacts that may appear locally
+__pycache__/
+*.py[cod]
