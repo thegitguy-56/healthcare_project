@@ -40,12 +40,13 @@ function Admin() {
 const [users, setUsers] = useState([])
 const [accessLogs, setAccessLogs] = useState([])
 const [loading, setLoading] = useState(true)
+const [errorMessage, setErrorMessage] = useState("")
 
 const [openUserDialog, setOpenUserDialog] = useState(false)
 
 const [newUser, setNewUser] = useState({
 username: "",
-email: "",
+password: "",
 role: "doctor",
 })
 
@@ -57,11 +58,14 @@ fetchAdminData()
 
 const fetchAdminData = async () => {
   try {
+    setErrorMessage("")
     const usersRes = await axios.get(`${API}/admin/users`);
     const logsRes = await axios.get(`${API}/admin/access-logs`);
     setUsers(usersRes.data);
     setAccessLogs(logsRes.data);
   } catch (err) {
+    const message = err?.response?.data?.message || "Failed to load admin data";
+    setErrorMessage(message)
     console.error("Admin API Error:", err);
   } finally {
     setLoading(false);
@@ -69,26 +73,35 @@ const fetchAdminData = async () => {
 };
 
 const handleAddUser = async () => {
-  if (!newUser.username || !newUser.email) return;
+  if (!newUser.username || !newUser.password) {
+    setErrorMessage("Username and password are required")
+    return
+  }
   try {
+    setErrorMessage("")
     await axios.post(`${API}/admin/users`, newUser);
     fetchAdminData();
     setNewUser({
       username: "",
-      email: "",
+      password: "",
       role: "doctor",
     });
     setOpenUserDialog(false);
   } catch (err) {
+    const message = err?.response?.data?.message || "Failed to add user";
+    setErrorMessage(message)
     console.error("Add user failed", err);
   }
 };
 
 const handleDeleteUser = async (id) => {
   try {
+    setErrorMessage("")
     await axios.delete(`${API}/admin/users/${id}`);
     fetchAdminData();
   } catch (err) {
+    const message = err?.response?.data?.message || "Failed to delete user";
+    setErrorMessage(message)
     console.error("Delete user failed", err);
   }
 };
@@ -118,6 +131,11 @@ return (
     <Typography variant="body2">
       Manage users and system access
     </Typography>
+    {errorMessage && (
+      <Typography color="error" sx={{ mt: 1 }}>
+        {errorMessage}
+      </Typography>
+    )}
   </Box>
 
   {loading ? (
@@ -311,10 +329,11 @@ return (
 
       <TextField
         fullWidth
-        label="Email"
+        label="Password"
+        type="password"
         margin="normal"
-        value={newUser.email}
-        onChange={e=>setNewUser({...newUser,email:e.target.value})}
+        value={newUser.password}
+        onChange={e=>setNewUser({...newUser,password:e.target.value})}
       />
 
       <FormControl fullWidth margin="normal">
@@ -327,7 +346,6 @@ return (
           onChange={e=>setNewUser({...newUser,role:e.target.value})}
         >
 
-          <MenuItem value="admin">Admin</MenuItem>
           <MenuItem value="doctor">Doctor</MenuItem>
           <MenuItem value="nurse">Nurse</MenuItem>
 
