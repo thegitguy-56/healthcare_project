@@ -1,6 +1,7 @@
 const express = require("express")
 const mysql = require("mysql2")
 const cors = require("cors")
+require("dotenv").config()
 
 const app = express()
 
@@ -8,10 +9,11 @@ app.use(cors())
 app.use(express.json())
 
 const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "123",
-  database: "healthcare_temporal",
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "123",
+  database: process.env.DB_NAME || "healthcare_temporal",
+  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
 }
 
 const db = mysql.createConnection(dbConfig)
@@ -530,7 +532,7 @@ app.get("/admin/users", async (req, res) => {
 })
 
 app.post("/admin/users", async (req, res) => {
-  const { username, password, role } = req.body
+  const { username, password, email, role } = req.body
 
   if (!username || !password) {
     return res.status(400).json({ message: "username and password are required" })
@@ -548,8 +550,10 @@ app.post("/admin/users", async (req, res) => {
 
     if (columns.has("username")) payload.username = String(username).trim()
     if (columns.has("password")) payload.password = String(password)
+    if (columns.has("email")) payload.email = email ? String(email).trim() : null
     if (columns.has("role")) payload.role = roleValue
     if (columns.has("status")) payload.status = "Active"
+    if (columns.has("created_at")) payload.created_at = new Date()
 
     if (Object.keys(payload).length === 0) {
       return res.status(500).json({ message: "Users table schema is not compatible" })
