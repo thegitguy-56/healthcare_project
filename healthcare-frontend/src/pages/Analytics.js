@@ -53,47 +53,57 @@ function Analytics() {
   useEffect(() => {
     setLoading(true)
     axios
-      .get("http://localhost:5000/analytics/diseases")
+      .get("http://localhost:5000/analytics/summary")
       .then((res) => {
         setChartData({
-          treatmentDuration: null,
-          diseaseDistribution: {
-            labels: res.data.map((d) => d.disease),
-            datasets: [
-              {
-                data: res.data.map((d) => d.total),
-                backgroundColor: [
-                  "rgba(25, 118, 210, 0.8)",
-                  "rgba(0, 172, 193, 0.8)",
-                  "rgba(46, 125, 50, 0.8)",
-                  "rgba(245, 124, 0, 0.8)",
-                  "rgba(198, 40, 40, 0.8)",
-                  "rgba(123, 31, 162, 0.8)",
-                ],
-                borderColor: [
-                  "rgb(25, 118, 210)",
-                  "rgb(0, 172, 193)",
-                  "rgb(46, 125, 50)",
-                  "rgb(245, 124, 0)",
-                  "rgb(198, 40, 40)",
-                  "rgb(123, 31, 162)",
-                ],
-                borderWidth: 2,
-                fill: true,
-              },
-            ],
-          },
-          patientTrends: null,
-          ageDistribution: null,
+          treatmentDuration: res.data.treatmentDuration || null,
+          diseaseDistribution: res.data.diseaseDistribution || null,
+          patientTrends: res.data.patientTrends || null,
+          ageDistribution: res.data.ageDistribution || null,
         })
       })
-      .catch(() => {
-        setChartData({
-          treatmentDuration: null,
-          diseaseDistribution: null,
-          patientTrends: null,
-          ageDistribution: null,
-        })
+      .catch(async () => {
+        try {
+          const diseasesRes = await axios.get("http://localhost:5000/analytics/diseases")
+          setChartData({
+            treatmentDuration: null,
+            diseaseDistribution: {
+              labels: diseasesRes.data.map((d) => d.disease),
+              datasets: [
+                {
+                  data: diseasesRes.data.map((d) => d.total),
+                  backgroundColor: [
+                    "rgba(25, 118, 210, 0.8)",
+                    "rgba(0, 172, 193, 0.8)",
+                    "rgba(46, 125, 50, 0.8)",
+                    "rgba(245, 124, 0, 0.8)",
+                    "rgba(198, 40, 40, 0.8)",
+                    "rgba(123, 31, 162, 0.8)",
+                  ],
+                  borderColor: [
+                    "rgb(25, 118, 210)",
+                    "rgb(0, 172, 193)",
+                    "rgb(46, 125, 50)",
+                    "rgb(245, 124, 0)",
+                    "rgb(198, 40, 40)",
+                    "rgb(123, 31, 162)",
+                  ],
+                  borderWidth: 2,
+                  fill: true,
+                },
+              ],
+            },
+            patientTrends: null,
+            ageDistribution: null,
+          })
+        } catch {
+          setChartData({
+            treatmentDuration: null,
+            diseaseDistribution: null,
+            patientTrends: null,
+            ageDistribution: null,
+          })
+        }
       })
       .finally(() => setLoading(false))
     // eslint-disable-next-line react-hooks/exhaustive-deps

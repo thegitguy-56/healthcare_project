@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   TextField,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -64,7 +65,12 @@ function Patients() {
     setAdding(true)
     setAddError("")
     try {
-      await axios.post("http://localhost:5000/patients", newPatient)
+      await axios.post("http://localhost:5000/patients", {
+        ...newPatient,
+        name: newPatient.name.trim(),
+        address: newPatient.address.trim(),
+        age: Number(newPatient.age),
+      })
       // Refresh patient list
       setLoading(true)
       const res = await axios.get("http://localhost:5000/patients")
@@ -72,7 +78,8 @@ function Patients() {
       setFilteredPatients(res.data)
       setNewPatient({ name: "", age: "", gender: "", address: "" })
     } catch (err) {
-      setAddError("Failed to add patient. Please check your input.")
+      const message = err?.response?.data?.message || "Failed to add patient. Please check your input."
+      setAddError(message)
     } finally {
       setAdding(false)
       setLoading(false)
@@ -147,12 +154,17 @@ function Patients() {
               <Grid item xs={12} sm={6} md={2}>
                 <TextField
                   label="Gender"
+                  select
                   value={newPatient.gender}
                   onChange={e => setNewPatient({ ...newPatient, gender: e.target.value })}
                   required
                   fullWidth
                   size="small"
-                />
+                >
+                  <MenuItem value="Male">Male</MenuItem>
+                  <MenuItem value="Female">Female</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
+                </TextField>
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
                 <TextField

@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 
 import DashboardLayout from "./layout/DashboardLayout"
 
@@ -14,6 +14,8 @@ function App() {
   const [role, setRole] = useState(
     localStorage.getItem("userRole") || null
   )
+  const normalizedRole = String(role || "").toLowerCase()
+  const isAdmin = normalizedRole === "admin"
 
   const handleLogout = () => {
     setRole(null)
@@ -34,7 +36,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/patients" element={<Patients />} />
           <Route path="/analytics" element={<Analytics />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin" element={isAdmin ? <Admin /> : <Navigate to="/" replace />} />
           <Route path="/patient/:id" element={<PatientProfile />} />
         </Routes>
       </DashboardLayout>

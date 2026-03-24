@@ -21,7 +21,6 @@ import BarChartIcon from "@mui/icons-material/BarChart"
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"
 import LogoutIcon from "@mui/icons-material/Logout"
 import NotificationsIcon from "@mui/icons-material/Notifications"
-import SettingsIcon from "@mui/icons-material/Settings"
 import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety"
 import { Link, useLocation } from "react-router-dom"
 import "./DashboardLayout.css"
@@ -29,6 +28,8 @@ import "./DashboardLayout.css"
 function DashboardLayout({ children, onLogout, userRole = "admin" }) {
   const [anchorEl, setAnchorEl] = useState(null)
   const location = useLocation()
+  const normalizedRole = String(userRole || "").toLowerCase()
+  const isAdmin = normalizedRole === "admin"
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget)
@@ -47,7 +48,7 @@ function DashboardLayout({ children, onLogout, userRole = "admin" }) {
     { path: "/", label: "Dashboard", icon: <DashboardIcon /> },
     { path: "/patients", label: "Patients", icon: <PeopleIcon /> },
     { path: "/analytics", label: "Analytics", icon: <BarChartIcon /> },
-    { path: "/admin", label: "Admin", icon: <AdminPanelSettingsIcon /> },
+    ...(isAdmin ? [{ path: "/admin", label: "Admin", icon: <AdminPanelSettingsIcon /> }] : []),
   ]
 
   const isActive = (path) => location.pathname === path
