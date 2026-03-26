@@ -66,6 +66,26 @@ const resolveTableName = async (tableName) => {
 const getFirstExistingColumn = (columns, candidates) =>
   candidates.find((name) => columns.has(name)) || null
 
+const getDefaultDoctorId = async () => {
+  const doctorColumns = await getTableColumns("Doctor")
+  const doctorIdColumn = getFirstExistingColumn(doctorColumns, ["doctor_id", "id"])
+
+  if (!doctorIdColumn) {
+    return null
+  }
+
+  const rows = await query(
+    `
+      SELECT ${doctorIdColumn} AS doctor_id
+      FROM Doctor
+      ORDER BY ${doctorIdColumn}
+      LIMIT 1
+    `
+  )
+
+  return rows[0]?.doctor_id || null
+}
+
 const normalizeRole = (role) => {
   if (!role || typeof role !== "string") return "Doctor"
   const lower = role.toLowerCase()
@@ -151,21 +171,149 @@ app.post("/patients", async (req, res) => {
   }
 })
 
-app.get("/treatments/:patientId", authorizeRole(["Admin", "Doctor"]), async (req, res) => {
-  const patientId = req.params.patientId
+app.get("/diagnoses/:patientId", async (req, res) => {
+  const patientId = Number(req.params.patientId)
+
+  if (!Number.isFinite(patientId)) {
+    return res.status(400).json({ message: "Invalid patient id" })
+  }
 
   try {
     const result = await query(
       `
-        SELECT treatment_type, medication, valid_from, valid_to
+        SELECT *
+        FROM Diagnosis_History
+        WHERE patient_id = ?
+        ORDER BY valid_from DESC
+      `,
+      [patientId]
+    )
+    res.json(result)
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch diagnoses", error: err.message })
+  }
+})
+
+app.post("/diagnoses/:patientId", async (req, res) => {
+  const patientId = Number(req.params.patientId)
+  const { disease, validFrom, validTo, doctorId } = req.body
+
+  if (!Number.isFinite(patientId)) {
+    return res.status(400).json({ message: "Invalid patient id" })
+  }
+
+  if (!disease || !validFrom) {
+    return res.status(400).json({ message: "disease and validFrom are required" })
+  }
+
+  try {
+    const columns = await getTableColumns("Diagnosis_History")
+    const payload = {}
+
+    if (columns.has("patient_id")) payload.patient_id = patientId
+    if (columns.has("disease")) payload.disease = String(disease).trim()
+    if (columns.has("valid_from")) payload.valid_from = validFrom
+    if (columns.has("valid_to") && validTo) payload.valid_to = validTo
+
+    if (columns.has("doctor_id")) {
+      const selectedDoctorId =
+        doctorId !== undefined && doctorId !== null && doctorId !== ""
+          ? Number(doctorId)
+          : await getDefaultDoctorId()
+
+      if (Number.isFinite(selectedDoctorId)) {
+        payload.doctor_id = selectedDoctorId
+      }
+    }
+
+    if (!payload.patient_id || !payload.disease || !payload.valid_from) {
+      return res.status(500).json({ message: "Diagnosis_History schema is not compatible" })
+    }
+
+    const insertColumns = Object.keys(payload)
+    const placeholders = insertColumns.map(() => "?").join(", ")
+    const sql = `INSERT INTO Diagnosis_History (${insertColumns.join(", ")}) VALUES (${placeholders})`
+    const result = await query(sql, insertColumns.map((k) => payload[k]))
+
+    res.status(201).json({
+      message: "Diagnosis added successfully",
+      diagnosisId: result.insertId,
+    })
+  } catch (err) {
+    res.status(500).json({ message: "Failed to add diagnosis", error: err.message })
+  }
+})
+
+app.get("/treatments/:patientId", authorizeRole(["Admin", "Doctor", "Nurse"]), async (req, res) => {
+  const patientId = Number(req.params.patientId)
+
+  if (!Number.isFinite(patientId)) {
+    return res.status(400).json({ message: "Invalid patient id" })
+  }
+
+  try {
+    const result = await query(
+      `
+        SELECT
+          treatment_type,
+          medication,
+          valid_from,
+          valid_to,
+          CASE
+            WHEN valid_to IS NOT NULL AND valid_to < CURDATE() THEN 'Completed'
+            WHEN valid_from > CURDATE() THEN 'Scheduled'
+            ELSE 'Active'
+          END AS status
         FROM Treatment_History
         WHERE patient_id = ?
+        ORDER BY valid_from DESC
       `,
       [patientId]
     )
     res.json(result)
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch treatments", error: err.message })
+  }
+})
+
+app.post("/treatments/:patientId", async (req, res) => {
+  const patientId = Number(req.params.patientId)
+  const { treatmentType, medication, validFrom, validTo, status } = req.body
+
+  if (!Number.isFinite(patientId)) {
+    return res.status(400).json({ message: "Invalid patient id" })
+  }
+
+  if (!treatmentType || !validFrom) {
+    return res.status(400).json({ message: "treatmentType and validFrom are required" })
+  }
+
+  try {
+    const columns = await getTableColumns("Treatment_History")
+    const payload = {}
+
+    if (columns.has("patient_id")) payload.patient_id = patientId
+    if (columns.has("treatment_type")) payload.treatment_type = String(treatmentType).trim()
+    if (columns.has("medication") && medication) payload.medication = String(medication).trim()
+    if (columns.has("valid_from")) payload.valid_from = validFrom
+    if (columns.has("valid_to") && validTo) payload.valid_to = validTo
+    if (columns.has("status") && status) payload.status = String(status).trim()
+
+    if (!payload.patient_id || !payload.treatment_type || !payload.valid_from) {
+      return res.status(500).json({ message: "Treatment_History schema is not compatible" })
+    }
+
+    const insertColumns = Object.keys(payload)
+    const placeholders = insertColumns.map(() => "?").join(", ")
+    const sql = `INSERT INTO Treatment_History (${insertColumns.join(", ")}) VALUES (${placeholders})`
+    const result = await query(sql, insertColumns.map((k) => payload[k]))
+
+    res.status(201).json({
+      message: "Treatment added successfully",
+      treatmentId: result.insertId,
+    })
+  } catch (err) {
+    res.status(500).json({ message: "Failed to add treatment", error: err.message })
   }
 })
 

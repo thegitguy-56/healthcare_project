@@ -12,6 +12,8 @@ import {
   Avatar,
   Divider,
   Chip,
+  TextField,
+  Alert,
 } from "@mui/material"
 import {
   Timeline,
@@ -37,27 +39,110 @@ function PatientProfile() {
   const navigate = useNavigate()
   const [patient, setPatient] = useState(null)
   const [treatments, setTreatments] = useState([])
+  const [diagnoses, setDiagnoses] = useState([])
+  const [diagnosisForm, setDiagnosisForm] = useState({
+    disease: "",
+    validFrom: new Date().toISOString().slice(0, 10),
+    validTo: "",
+  })
+  const [treatmentForm, setTreatmentForm] = useState({
+    treatmentType: "",
+    medication: "",
+    validFrom: new Date().toISOString().slice(0, 10),
+    validTo: "",
+  })
+  const [savingDiagnosis, setSavingDiagnosis] = useState(false)
+  const [savingTreatment, setSavingTreatment] = useState(false)
+  const [saveError, setSaveError] = useState("")
+  const [saveSuccess, setSaveSuccess] = useState("")
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  const role = localStorage.getItem("userRole") || ""
+
+  const loadPatientData = async () => {
     setLoading(true)
-    Promise.all([
-      axios.get(`${API_URL}/patients`),
-      axios.get(`${API_URL}/treatments/${id}`),
-    ])
-      .then(([patientsRes, treatmentsRes]) => {
-        const p = patientsRes.data.find(
-          (x) => x.patient_id === parseInt(id)
-        )
-        setPatient(p)
-        setTreatments(treatmentsRes.data)
-      })
-      .catch(() => {
-        setPatient(null)
-        setTreatments([])
-      })
-      .finally(() => setLoading(false))
+    try {
+      const [patientsRes, treatmentsRes, diagnosesRes] = await Promise.all([
+        axios.get(`${API_URL}/patients`),
+        axios.get(`${API_URL}/treatments/${id}`, { headers: { role } }),
+        axios.get(`${API_URL}/diagnoses/${id}`),
+      ])
+
+      const p = patientsRes.data.find((x) => x.patient_id === parseInt(id, 10))
+      setPatient(p || null)
+      setTreatments(treatmentsRes.data || [])
+      setDiagnoses(diagnosesRes.data || [])
+    } catch {
+      setPatient(null)
+      setTreatments([])
+      setDiagnoses([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadPatientData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
+
+  const handleAddDiagnosis = async (event) => {
+    event.preventDefault()
+    setSaveError("")
+    setSaveSuccess("")
+    setSavingDiagnosis(true)
+
+    try {
+      await axios.post(`${API_URL}/diagnoses/${id}`, {
+        disease: diagnosisForm.disease.trim(),
+        validFrom: diagnosisForm.validFrom,
+        validTo: diagnosisForm.validTo || null,
+      })
+
+      setDiagnosisForm({
+        disease: "",
+        validFrom: new Date().toISOString().slice(0, 10),
+        validTo: "",
+      })
+      setSaveSuccess("Diagnosis added and saved to database.")
+      await loadPatientData()
+    } catch (err) {
+      setSaveError(err?.response?.data?.message || "Failed to add diagnosis")
+    } finally {
+      setSavingDiagnosis(false)
+    }
+  }
+
+  const handleAddTreatment = async (event) => {
+    event.preventDefault()
+    setSaveError("")
+    setSaveSuccess("")
+    setSavingTreatment(true)
+
+    try {
+      await axios.post(`${API_URL}/treatments/${id}`, {
+        treatmentType: treatmentForm.treatmentType.trim(),
+        medication: treatmentForm.medication.trim(),
+        validFrom: treatmentForm.validFrom,
+        validTo: treatmentForm.validTo || null,
+      })
+
+      setTreatmentForm({
+        treatmentType: "",
+        medication: "",
+        validFrom: new Date().toISOString().slice(0, 10),
+        validTo: "",
+      })
+      setSaveSuccess("Treatment added and saved to database.")
+      await loadPatientData()
+    } catch (err) {
+      setSaveError(err?.response?.data?.message || "Failed to add treatment")
+    } finally {
+      setSavingTreatment(false)
+    }
+  }
+
+  const latestDiagnosis = diagnoses[0]?.disease || patient?.diagnosis || "Not specified"
 
   if (loading) {
     return (
@@ -254,7 +339,7 @@ function PatientProfile() {
                   Primary Diagnosis
                 </Typography>
                 <Chip
-                  label={patient.diagnosis || "Not specified"}
+                  label={latestDiagnosis}
                   color="error"
                   variant="outlined"
                   sx={{ fontWeight: 500 }}
@@ -264,8 +349,163 @@ function PatientProfile() {
           </Card>
         </Grid>
 
-        {/* Treatment Timeline */}
+        {/* Add Diagnosis & Treatment */}
         <Grid item xs={12} lg={8}>
+          <Card
+            sx={{
+              borderRadius: "12px",
+              border: "1px solid #e0e4e8",
+              mb: 3,
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                Add Diagnosis / Treatment
+              </Typography>
+
+              {saveError && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {saveError}
+                </Alert>
+              )}
+              {saveSuccess && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                  {saveSuccess}
+                </Alert>
+              )}
+
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <Grid item xs={12}>
+                  <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                    New Diagnosis
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <TextField
+                    label="Disease"
+                    fullWidth
+                    size="small"
+                    required
+                    value={diagnosisForm.disease}
+                    onChange={(e) =>
+                      setDiagnosisForm({ ...diagnosisForm, disease: e.target.value })
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <TextField
+                    label="Valid From"
+                    type="date"
+                    fullWidth
+                    size="small"
+                    required
+                    InputLabelProps={{ shrink: true }}
+                    value={diagnosisForm.validFrom}
+                    onChange={(e) =>
+                      setDiagnosisForm({ ...diagnosisForm, validFrom: e.target.value })
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <TextField
+                    label="Valid To"
+                    type="date"
+                    fullWidth
+                    size="small"
+                    InputLabelProps={{ shrink: true }}
+                    value={diagnosisForm.validTo}
+                    onChange={(e) =>
+                      setDiagnosisForm({ ...diagnosisForm, validTo: e.target.value })
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    sx={{ height: "40px" }}
+                    disabled={savingDiagnosis}
+                    onClick={handleAddDiagnosis}
+                  >
+                    {savingDiagnosis ? "Saving..." : "Add"}
+                  </Button>
+                </Grid>
+              </Grid>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                    New Treatment
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <TextField
+                    label="Treatment Type"
+                    fullWidth
+                    size="small"
+                    required
+                    value={treatmentForm.treatmentType}
+                    onChange={(e) =>
+                      setTreatmentForm({ ...treatmentForm, treatmentType: e.target.value })
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <TextField
+                    label="Medication"
+                    fullWidth
+                    size="small"
+                    value={treatmentForm.medication}
+                    onChange={(e) =>
+                      setTreatmentForm({ ...treatmentForm, medication: e.target.value })
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <TextField
+                    label="Valid From"
+                    type="date"
+                    fullWidth
+                    size="small"
+                    required
+                    InputLabelProps={{ shrink: true }}
+                    value={treatmentForm.validFrom}
+                    onChange={(e) =>
+                      setTreatmentForm({ ...treatmentForm, validFrom: e.target.value })
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <TextField
+                    label="Valid To"
+                    type="date"
+                    fullWidth
+                    size="small"
+                    InputLabelProps={{ shrink: true }}
+                    value={treatmentForm.validTo}
+                    onChange={(e) =>
+                      setTreatmentForm({ ...treatmentForm, validTo: e.target.value })
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    sx={{ height: "40px" }}
+                    disabled={savingTreatment}
+                    onClick={handleAddTreatment}
+                  >
+                    {savingTreatment ? "Saving..." : "Add"}
+                  </Button>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+
+          {/* Treatment Timeline */}
           <Card
             sx={{
               borderRadius: "12px",
